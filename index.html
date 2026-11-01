@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartSpend</title>
+    <meta
+      name="description"
+      content="SmartSpend helps students and young adults manage spending, budgets, and savings in one place."
+    />
+    <link rel="stylesheet" href="style.css?v=17" />
+    <script src="assets/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div id="startupSplash" class="startup-splash" role="status" aria-label="Starting SmartSpend">
+      <img class="startup-splash-logo" src="assets/smartspend-logo-themed.png" alt="SmartSpend — Expenses Tracker" />
+    </div>
+    <div id="loginScreen" class="login-screen" aria-live="polite">
+      <div class="login-brand" aria-label="SmartSpend logo and brand">
+        <img src="assets/smartspend-mark.png" alt="" />
+        <strong>SmartSpend</strong>
+      </div>
+      <div class="login-card">
+        <div class="login-logo">S</div>
+        <h1>Welcome back</h1>
+        <p>Sign in to manage your spending, budget, and savings.</p>
+
+        <form id="loginForm" class="login-form">
+          <label class="field">
+            <span>User Name</span>
+            <input id="loginUserName" type="text" placeholder="Enter your name" required />
+          </label>
+
+          <label class="field">
+            <span>Password</span>
+            <input id="loginPassword" type="password" placeholder="Enter password" required />
+          </label>
+
+          <div class="field">
+            <span>I am a</span>
+            <div class="user-role-picker" role="radiogroup" aria-label="Select user type">
+              <label class="role-option">
+                <input type="radio" name="userType" value="Student" checked />
+                <span>Student</span>
+              </label>
+              <label class="role-option">
+                <input type="radio" name="userType" value="Working Person" />
+                <span>Working Person</span>
+              </label>
+              <label class="role-option">
+                <input type="radio" name="userType" value="Housewife" />
+                <span>Housewife</span>
+              </label>
+            </div>
+          </div>
+
+          <button class="primary-button full-width" type="submit">Login to SmartSpend</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="app-shell" id="appShell">
+      <aside class="sidebar" id="mainSidebar" aria-label="Sidebar navigation">
+        <div class="brand" aria-label="SmartSpend logo and brand">
+          <img class="brand-logo" src="assets/smartspend-mark.png" alt="SmartSpend wallet logo" />
+          <div class="brand-copy">
+            <span class="brand-name">SmartSpend</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Main navigation">
+          <button class="nav-item active" type="button" data-target="dashboard">
+            <span class="nav-icon" aria-hidden="true">◉</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-item" type="button" data-target="expenses">
+            <span class="nav-icon" aria-hidden="true">◌</span>
+            <span>Expenses</span>
+          </button>
+          <button class="nav-item" type="button" data-target="previous-month-section">
+            <span class="nav-icon" aria-hidden="true">◌</span>
+            <span>History</span>
+          </button>
+          <button class="nav-item" type="button" data-target="income-section">
+            <span class="nav-icon" aria-hidden="true">◌</span>
+            <span>Income</span>
+          </button>
+          <button class="nav-item" type="button" data-target="budget-section">
+            <span class="nav-icon" aria-hidden="true">◌</span>
+            <span>Budget</span>
+          </button>
+          <button class="nav-item" type="button" data-target="analytics-section">
+            <span class="nav-icon" aria-hidden="true">◌</span>
+            <span>Analytics</span>
+          </button>
+          <button class="nav-item" type="button" data-target="savings-section">
+            <span class="nav-icon" aria-hidden="true">◌</span>
+            <span>Savings</span>
+          </button>
+          <button class="nav-item" type="button" data-target="student-mode">
+            <span class="nav-icon" aria-hidden="true">◌</span>
+            <span>Smart Monthly Plan</span>
+          </button>
+          <button class="nav-item" type="button" data-target="settings-section">
+            <span class="nav-icon" aria-hidden="true">◌</span>
+            <span>Settings</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-card">
+          <p>Monthly budget</p>
+          <h3 id="sidebarBudgetText">₹0</h3>
+        </div>
+      </aside>
+      <button id="sidebarOverlay" class="sidebar-overlay" type="button" aria-label="Close navigation menu"></button>
+
+      <div class="main-panel">
+        <header class="topbar">
+          <button id="mobileNavToggle" class="mobile-nav-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mainSidebar">
+            <span aria-hidden="true">☰</span>
+          </button>
+          <span class="topbar-wallet" role="img" aria-label="Wallet">
+            <svg viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 6A2.5 2.5 0 0 1 5.5 3.5H20a1.5 1.5 0 0 1 1.5 1.5v2.5H14a3.5 3.5 0 0 0 0 7h7.5V17H5.5A2.5 2.5 0 0 1 3 14.5V6Z" fill="currentColor" />
+              <path d="M14 8.5h7.5v5H14a2.5 2.5 0 0 1 0-5Z" fill="#fff4ef" />
+              <circle cx="15" cy="11" r="1" fill="currentColor" />
+            </svg>
+          </span>
+          <div class="month-badge" id="currentMonth">June 2026</div>
+
+          <div class="topbar-actions">
+            <div class="profile-menu">
+              <button id="profileMenuToggle" class="user-profile" type="button" aria-label="Open user profile menu" aria-expanded="false" aria-controls="profileMenu">
+                <span class="avatar">A</span>
+                <span class="profile-copy">
+                  <span class="profile-label">Welcome</span>
+                  <strong>Aarav</strong>
+                </span>
+                <span class="profile-chevron" aria-hidden="true">▾</span>
+              </button>
+              <div id="profileMenu" class="profile-dropdown" hidden>
+                <button type="button" data-portal-link="settings-section">Settings</button>
+                <button id="logoutButton" type="button">Log out</button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main class="dashboard" id="dashboard">
+          <section class="summary-grid" data-portal="dashboard" aria-label="Financial summary cards">
+            <article class="summary-card income-card">
+              <div class="summary-copy">
+                <span class="summary-label">Money Earned</span>
+                <strong id="totalIncome">₹0</strong>
+                <small>Monthly inflow</small>
+              </div>
+              <div class="summary-icon">📈</div>
+            </article>
+
+            <article class="summary-card expense-card">
+              <div class="summary-copy">
+                <span class="summary-label">Money Spent</span>
+                <strong id="totalExpenses">₹0</strong>
+                <small>Monthly outflow</small>
+              </div>
+              <div class="summary-icon">📉</div>
+            </article>
+
+            <article class="summary-card balance-card">
+              <div class="summary-copy">
+                <span class="summary-label">Total Balance</span>
+                <strong id="totalBalance">₹0</strong>
+                <small id="balanceMeta">No transactions yet</small>
+              </div>
+              <div class="summary-icon">💰</div>
+            </article>
+
+            <article class="summary-card remaining-card">
+              <div class="summary-copy">
+                <span class="summary-label">Remaining Budget</span>
+                <strong id="remainingBudget">₹0</strong>
+                <small id="remainingBudgetMeta">Budget is ready</small>
+              </div>
+              <div class="summary-icon">🧾</div>
+            </article>
+          </section>
+
+          <section class="middle-grid" data-portal="budget-section">
+            <article class="panel budget-panel" id="budget-section">
+              <div class="panel-header">
+                <h2>Monthly Budget</h2>
+                <span class="status-badge" id="budgetStatus">You're on track</span>
+              </div>
+
+              <div class="budget-amount-row">
+                <h3 id="budgetAmount">₹0</h3>
+              </div>
+
+              <div class="budget-details">
+                <div>
+                  <span>Spent</span>
+                  <strong id="spentAmount">₹0</strong>
+                </div>
+                <div>
+                  <span>Remaining</span>
+                  <strong id="remainingBudgetText">₹0</strong>
+                </div>
+              </div>
+
+              <div class="progress-track" aria-label="Budget progress bar">
+                <span id="budgetProgressBar"></span>
+              </div>
+
+              <div class="progress-footer">
+                <span id="budgetProgressText">0%</span>
+                <button id="setBudgetButton" class="secondary-button" type="button">Set Budget</button>
+              </div>
+            </article>
+
+          </section>
+
+          <section class="panel income-panel" data-portal="income-section">
+            <div class="panel-header">
+              <h2>Income</h2>
+            </div>
+            <div class="analytics-metrics">
+              <div class="metric-box">
+                <span>This month's income</span>
+                <strong id="incomePortalTotal">₹0</strong>
+              </div>
+              <div class="metric-box">
+                <span>Income entries</span>
+                <strong id="incomePortalCount">0</strong>
+              </div>
+            </div>
+            <div id="incomeTransactionList" class="income-transaction-list" aria-live="polite"></div>
+          </section>
+
+          <section class="panel transactions-panel" id="expenses" data-portal="expenses">
+            <div class="panel-header">
+              <h2>Recent Transactions</h2>
+            </div>
+
+            <div class="filter-grid">
+              <label class="field inline-field">
+                <span>Search</span>
+                <input id="searchInput" type="search" placeholder="Search transactions" />
+              </label>
+
+              <label class="field inline-field">
+                <span>Category</span>
+                <select id="categoryFilter">
+                  <option value="all">All categories</option>
+                  <option value="Food">Food</option>
+                  <option value="Transport">Transport</option>
+                  <option value="Education">Education</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="Health">Health</option>
+                  <option value="Bills">Bills</option>
+                  <option value="Recharge">Recharge</option>
+                  <option value="Goal savings">Goal savings</option>
+                  <option value="Other">Other</option>
+                  <option value="Pocket Money">Pocket Money</option>
+                  <option value="Salary">Salary</option>
+                  <option value="Scholarship">Scholarship</option>
+                  <option value="Freelance">Freelance</option>
+                  <option value="Gift">Gift</option>
+                </select>
+              </label>
+
+              <label class="field inline-field">
+                <span>Payment</span>
+                <select id="paymentFilter">
+                  <option value="all">All methods</option>
+                  <option value="Cash">Cash</option>
+                  <option value="UPI">UPI</option>
+                  <option value="Card">Card</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                </select>
+              </label>
+
+              <label class="field inline-field">
+                <span>Type</span>
+                <select id="typeFilter">
+                  <option value="all">All</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+              </label>
+
+              <label class="field inline-field">
+                <span>Date</span>
+                <input id="dateFilter" type="date" />
+              </label>
+
+              <label class="field inline-field">
+                <span>Sort</span>
+                <select id="sortFilter">
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="highest">Highest amount</option>
+                  <option value="lowest">Lowest amount</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="transactionList" class="transaction-list" aria-live="polite"></div>
+          </section>
+
+          <section class="panel previous-month-panel" id="previous-month-section" data-portal="previous-month-section">
+            <div class="panel-header previous-month-header">
+              <div>
+                <h2>History</h2>
+                <p class="panel-subtitle">Review previous months' expense records, spending summaries, and report totals.</p>
+              </div>
+              <label class="field month-picker">
+                <span>Choose month</span>
+                <input id="expenditureMonth" type="month" />
+              </label>
+              <button id="addHistoricalExpenseButton" class="primary-button" type="button">+ Add expense for this month</button>
+            </div>
+
+            <div class="previous-month-summary">
+              <div class="metric-box">
+                <span id="expenditureMonthLabel">Monthly expenses</span>
+                <strong id="expenditureMonthTotal">₹0</strong>
+              </div>
+              <div class="metric-box">
+                <span>Expense entries</span>
+                <strong id="expenditureMonthCount">0</strong>
+              </div>
+              <div class="metric-box">
+                <span>Change vs prior month</span>
+                <strong id="expenditureMonthChange">No comparison</strong>
+              </div>
+            </div>
+
+            <div class="previous-month-content">
+              <div>
+                <h3>Category breakdown</h3>
+                <div id="expenditureCategoryList" class="expenditure-category-list"></div>
+              </div>
+              <div>
+                <h3>Transactions</h3>
+                <div id="expenditureTransactionList" class="expenditure-transaction-list" aria-live="polite"></div>
+              </div>
+            </div>
+
+            <div class="monthly-report-history-panel">
+              <h3>Previous month summaries</h3>
+              <div id="monthlyReportHistory" class="monthly-report-history" aria-live="polite"></div>
+            </div>
+          </section>
+
+          <section class="panel analytics-panel" id="analytics-section" data-portal="analytics-section">
+            <div class="panel-header">
+              <h2>Analytics</h2>
+            </div>
+
+            <div class="analytics-metrics">
+              <div class="metric-box">
+                <span>This month's income</span>
+                <strong id="analyticsIncome">₹0</strong>
+              </div>
+              <div class="metric-box">
+                <span>This month's expenses</span>
+                <strong id="analyticsExpenses">₹0</strong>
+              </div>
+              <div class="metric-box">
+                <span>Average daily spending this month</span>
+                <strong id="averageDailySpending">₹0</strong>
+              </div>
+              <div class="metric-box">
+                <span>Top spending category this month</span>
+                <strong id="highestCategory">—</strong>
+              </div>
+              <div class="metric-box">
+                <span>Highest expense this month</span>
+                <strong id="highestExpense">₹0</strong>
+              </div>
+              <div class="metric-box">
+                <span>Transactions this month</span>
+                <strong id="transactionCount">0</strong>
+              </div>
+            </div>
+
+            <div class="chart-grid">
+              <div class="chart-box">
+                <h3>Monthly expense trend</h3>
+                <canvas id="monthlyTrendChart"></canvas>
+              </div>
+              <div class="chart-box">
+                <h3>Category spending</h3>
+                <canvas id="categoryChart"></canvas>
+              </div>
+              <div class="chart-box">
+                <h3>Income vs expenses</h3>
+                <canvas id="incomeExpenseChart"></canvas>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel student-panel" id="student-mode" data-portal="student-mode">
+            <div class="panel-header">
+              <h2>Smart Monthly Plan</h2>
+            </div>
+
+            <div class="student-content">
+              <form id="studentModeForm" class="student-form">
+                <label class="field">
+                  <span>Monthly income or allowance</span>
+                  <input id="pocketMoneyInput" type="number" min="0" step="100" placeholder="3000" />
+                </label>
+                <label class="field">
+                  <span>Days to plan for</span>
+                  <input id="collegeDaysInput" type="number" min="1" step="1" placeholder="30" />
+                </label>
+                <label class="field">
+                  <span>Monthly savings target</span>
+                  <input id="savingsTargetInput" type="number" min="0" step="100" placeholder="5000" />
+                </label>
+                <button class="primary-button" type="submit">Save monthly plan</button>
+              </form>
+
+              <div class="student-metrics">
+                <div class="metric-box">
+                  <span>Suggested daily limit</span>
+                  <strong id="dailyLimitValue">₹0/day</strong>
+                </div>
+                <div class="metric-box">
+                  <span>Today's spending</span>
+                  <strong id="todaySpending">₹0</strong>
+                </div>
+                <div class="metric-box">
+                  <span>Today's remaining</span>
+                  <strong id="todayRemaining">₹0</strong>
+                </div>
+                <div class="metric-box">
+                  <span>Monthly spending</span>
+                  <strong id="monthlySpendingValue">₹0</strong>
+                </div>
+                <div class="metric-box">
+                  <span>Remaining monthly funds</span>
+                  <strong id="remainingPocketMoney">₹0</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel savings-panel" id="savings-section" data-portal="savings-section">
+            <div class="panel-header">
+              <h2>Savings</h2>
+              <button id="addGoalButton" class="primary-button" type="button" aria-expanded="false" aria-controls="savingsForm">+ Add goal</button>
+            </div>
+
+            <form id="savingsForm" class="savings-form" hidden>
+              <label class="field">
+                <span>Goal name</span>
+                <input id="goalName" type="text" placeholder="New Laptop" required />
+              </label>
+              <label class="field">
+                <span>Target amount</span>
+                <input id="targetAmount" type="number" min="0" step="100" placeholder="50000" required />
+              </label>
+              <label class="field">
+                <span>Current saved amount</span>
+                <input id="currentSavedAmount" type="number" min="0" step="100" placeholder="12000" required />
+              </label>
+              <label class="field">
+                <span>Target date</span>
+                <input id="targetDate" type="date" required />
+              </label>
+              <div class="savings-form-actions">
+                <button class="primary-button" type="submit">Create goal</button>
+                <button id="cancelGoalButton" class="secondary-button" type="button">Cancel</button>
+              </div>
+            </form>
+
+            <div id="savingsList" class="savings-list"></div>
+          </section>
+
+          <section class="panel insights-panel" data-portal="dashboard">
+            <div class="panel-header">
+              <h2>Smart Insights</h2>
+            </div>
+
+            <ul id="smartInsightsList" class="insights-list"></ul>
+          </section>
+
+          <section class="panel settings-panel" id="settings-section" data-portal="settings-section">
+            <div class="panel-header">
+              <h2>Settings</h2>
+            </div>
+
+            <div class="settings-grid">
+              <div class="setting-card">
+                <span>Appearance</span>
+                <strong id="currentThemeLabel">Light theme</strong>
+                <button id="darkModeToggle" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Dark mode">
+                  <span>Dark mode</span>
+                  <span class="theme-switch-track" aria-hidden="true"></span>
+                </button>
+              </div>
+              <div class="setting-card">
+                <span>Smart monthly plan</span>
+                <strong>Personalized monthly spending controls</strong>
+                <button class="inline-link" type="button" data-portal-link="student-mode">Open monthly plan</button>
+              </div>
+            </div>
+          </section>
+        </main>
+        <nav class="quick-actions-menu" aria-label="Quick actions">
+          <button id="addExpenseButton" class="primary-button" type="button">+ Expense</button>
+          <button id="addIncomeButton" class="secondary-button" type="button">+ Income</button>
+          <button id="budgetShortcutButton" class="ghost-button" type="button">Set Budget</button>
+        </nav>
+      </div>
+    </div>
+
+    <div id="expenseModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal="true"></div>
+
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="expenseModalTitle">
+        <div class="modal-header">
+          <h2 id="expenseModalTitle">Add Expense</h2>
+          <button id="closeExpenseModal" class="close-button" type="button" aria-label="Close modal">×</button>
+        </div>
+
+        <form id="expenseForm" novalidate>
+          <div class="form-grid">
+            <label class="field">
+              <span>Expense title</span>
+              <input id="expenseTitle" name="title" type="text" placeholder="Groceries" required />
+            </label>
+
+            <label class="field">
+              <span>Amount</span>
+              <input id="expenseAmount" name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required />
+            </label>
+
+            <label class="field">
+              <span>Category</span>
+              <select id="expenseCategory" name="category" required>
+                <option value="">Select category</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Education">Education</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Health">Health</option>
+                <option value="Bills">Bills</option>
+                <option value="Recharge">Recharge</option>
+                <option value="Goal savings">Goal savings</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+
+            <label id="expenseGoalField" class="field" hidden>
+              <span>Which goal is this money for?</span>
+              <select id="expenseGoal" name="goalId">
+                <option value="">Select a savings goal</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Date</span>
+              <input id="expenseDate" name="date" type="date" required />
+            </label>
+
+            <label class="field">
+              <span>Payment method</span>
+              <select id="expensePayment" name="paymentMethod">
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Card">Card</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </label>
+
+            <label class="field field-full">
+              <span>Description</span>
+              <textarea id="expenseDescription" name="description" rows="3" placeholder="Optional notes"></textarea>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button id="cancelExpenseButton" class="secondary-button" type="button">Cancel</button>
+            <button class="primary-button" type="submit">Save Expense</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="incomeModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close-income-modal="true"></div>
+
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="incomeModalTitle">
+        <div class="modal-header">
+          <h2 id="incomeModalTitle">Add Income</h2>
+          <button id="closeIncomeModal" class="close-button" type="button" aria-label="Close modal">×</button>
+        </div>
+
+        <form id="incomeForm" novalidate>
+          <div class="form-grid">
+            <label class="field">
+              <span>Income source</span>
+              <select id="incomeSource" required>
+                <option value="">Select source</option>
+                <option value="Pocket Money">Pocket Money</option>
+                <option value="Salary">Salary</option>
+                <option value="Scholarship">Scholarship</option>
+                <option value="Freelance">Freelance</option>
+                <option value="Gift">Gift</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Amount</span>
+              <input id="incomeAmount" type="number" min="0.01" step="0.01" placeholder="0.00" required />
+            </label>
+
+            <label class="field">
+              <span>Date</span>
+              <input id="incomeDate" type="date" required />
+            </label>
+
+            <label class="field field-full">
+              <span>Description</span>
+              <textarea id="incomeDescription" rows="3" placeholder="Optional notes"></textarea>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button id="cancelIncomeButton" class="secondary-button" type="button">Cancel</button>
+            <button class="primary-button" type="submit">Save Income</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="budgetModal" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close-budget-modal="true"></div>
+
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="budgetModalTitle">
+        <div class="modal-header">
+          <h2 id="budgetModalTitle">Set Monthly Budget</h2>
+          <button id="closeBudgetModal" class="close-button" type="button" aria-label="Close modal">×</button>
+        </div>
+
+        <form id="budgetForm">
+          <div class="form-grid single-grid">
+            <label class="field">
+              <span>Monthly budget</span>
+              <input id="budgetInput" type="number" min="0" step="100" placeholder="8000" required />
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button id="cancelBudgetButton" class="secondary-button" type="button">Cancel</button>
+            <button class="primary-button" type="submit">Save Budget</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="script.js?v=17"></script>
+  </body>
+</html>
